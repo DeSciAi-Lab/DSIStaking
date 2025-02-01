@@ -117,7 +117,7 @@ import {
   useEventListener,
   useTheme as useChakraTheme,
 } from '@chakra-ui/react';
-import { InfoIcon, QuestionIcon, ExternalLinkIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { InfoIcon, QuestionIcon, ExternalLinkIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { FaWallet } from 'react-icons/fa';
 import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
@@ -125,28 +125,56 @@ import DSIStakingContract from './contracts/DSIStaking.json';
 
 // Create custom theme
 const theme = extendTheme({
-  config: {
-    initialColorMode: 'dark',
-    useSystemColorMode: false,
+  fonts: {
+    heading: 'Gellix, system-ui, sans-serif',
+    body: 'Inter, system-ui, sans-serif',
+  },
+  components: {
+    Heading: {
+      baseStyle: {
+        fontFamily: 'Gellix, system-ui, sans-serif',
+        fontWeight: '600',
+      },
+    },
+    Text: {
+      baseStyle: {
+        fontFamily: 'Inter, system-ui, sans-serif',
+      },
+    },
+    Button: {
+      baseStyle: {
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontWeight: '500',
+      },
+    },
   },
   styles: {
     global: {
       body: {
-        bg: '#0A0B1E', // Darker background matching DeSciAI
+        fontFamily: 'Inter, system-ui, sans-serif',
+        bg: '#0A0B1E',
         color: 'white',
         minH: '100vh',
         overflowX: 'hidden',
         transition: 'all 0.3s ease-in-out'
       },
-      'html': {
-        scrollBehavior: 'smooth'
+      h1: {
+        fontFamily: 'Gellix, system-ui, sans-serif',
       },
-      '.no-scrollbar': {
-        '-ms-overflow-style': 'none',
-        'scrollbarWidth': 'none',
-        '&::-webkit-scrollbar': {
-          display: 'none'
-        }
+      h2: {
+        fontFamily: 'Gellix, system-ui, sans-serif',
+      },
+      h3: {
+        fontFamily: 'Gellix, system-ui, sans-serif',
+      },
+      h4: {
+        fontFamily: 'Gellix, system-ui, sans-serif',
+      },
+      h5: {
+        fontFamily: 'Gellix, system-ui, sans-serif',
+      },
+      h6: {
+        fontFamily: 'Gellix, system-ui, sans-serif',
       }
     }
   },
@@ -887,537 +915,668 @@ function App() {
     <ChakraProvider theme={theme}>
       <Box minH="100vh" bg="#0A0B1E">
         {/* Navigation */}
-        <Flex 
-          as="nav" 
-          align="center" 
-          justify="space-between" 
-          padding={{ base: "3", md: "4" }}
-          position="relative"
-          borderBottom="1px"
-          borderColor="whiteAlpha.200"
+        <Box
+          as="header"
+          position="fixed"
+          top="0"
+          left="0"
+          right="0"
+          zIndex="1000"
+          bg="rgba(10, 5, 28, 0.5)"
+          backdropFilter="blur(12px)"
         >
-          <HStack spacing={{ base: "4", md: "8" }}>
-            <Image 
-              src="/logo.png" 
-              alt="DeSciAI Logo"
-              height={{ base: "32px", md: "40px" }}
-              width="auto"
-              objectFit="contain"
-            />
-            
+          <Flex 
+            as="nav" 
+            align="center" 
+            justify="space-between" 
+            maxW="1200px"
+            mx="auto"
+            px={{ base: "4", md: "8" }}
+            height="72px"
+          >
+            {/* Logo */}
+            <Link href="https://desciai.io">
+              <Image 
+                src="/logo.png" 
+                alt="DeSciAI Logo"
+                height="32px"
+                width="auto"
+                objectFit="contain"
+              />
+            </Link>
+
             {/* Desktop Navigation */}
             <HStack 
-              spacing={{ base: "3", md: "6" }}
-              display={{ base: "none", md: "flex" }}
+              spacing="9"
+              display={{ base: "none", lg: "flex" }}
             >
-              <Button variant="ghost" size="md">Projects</Button>
-              <Button variant="ghost" isActive size="md">Staking</Button>
-              <Button variant="ghost" size="md">Apply</Button>
-              <Button variant="ghost" size="md">Dashboard</Button>
+              <Link 
+                href="https://desciai.io/ai-agents" 
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  AI-AGENTS
+                </Text>
+              </Link>
+              <Link 
+                href="https://desciai.io/teams"
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  TEAM
+                </Text>
+              </Link>
+              <Link 
+                href="https://desciailabs-organization.gitbook.io/desciai.io"
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  WHITEPAPER
+                </Text>
+              </Link>
+              <Link 
+                href="https://desciai.io/how-it-works"
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  HOW IT WORKS
+                </Text>
+              </Link>
+              <Link 
+                href="https://dashboard.desciai.io/researchers"
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  RESEARCHERS
+                </Text>
+              </Link>
+             
             </HStack>
-          </HStack>
 
-          <HStack spacing="4">
-            <Button
-              onClick={account ? disconnectWallet : connectWallet}
-              variant="solid"
-              size={{ base: "md", md: "lg" }}
-              leftIcon={<FaWallet />}
-            >
-              {!account ? "Connect Wallet" : `${account.slice(0, 6)}...${account.slice(-4)}`}
-            </Button>
+            <HStack spacing="4">
+              {/* Wallet Button */}
+              <Button
+                onClick={account ? disconnectWallet : connectWallet}
+                bg="#96519F"
+                _hover={{ bg: "#B671BF" }}
+                color="white"
+                size="md"
+                fontSize="14px"
+                fontWeight="500"
+                px="6"
+                height="40px"
+                borderRadius="full"
+              >
+                {!account ? "Connect Wallet" : `${account.slice(0, 6)}...${account.slice(-4)}`}
+              </Button>
 
-            {/* Hamburger Menu Button - Mobile Only */}
-            <IconButton
-              display={{ base: "flex", md: "none" }}
-              onClick={onOpen}
-              variant="ghost"
-              icon={<HamburgerIcon />}
-              aria-label="Open menu"
-              size="lg"
-            />
-          </HStack>
+              {/* Hamburger Menu - Mobile Only */}
+              <IconButton
+                display={{ base: "flex", lg: "none" }}
+                onClick={onOpen}
+                variant="ghost"
+                icon={<HamburgerIcon />}
+                aria-label="Open menu"
+                color="white"
+              />
+            </HStack>
+          </Flex>
+        </Box>
 
-          {/* Mobile Navigation Drawer */}
-          <Drawer
-            isOpen={isOpen}
-            placement="right"
-            onClose={onClose}
-            size="full"
-          >
-            <DrawerOverlay backdropFilter="blur(10px)" />
-            <DrawerContent bg="rgba(10, 11, 30, 0.97)">
-              <DrawerCloseButton size="lg" />
-              <DrawerHeader borderBottomWidth="1px" borderColor="whiteAlpha.200">
-                <Text color="brand.300" fontSize="2xl">DeSciAI</Text>
-              </DrawerHeader>
+        {/* Update Mobile Drawer */}
+        <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="full">
+          <DrawerOverlay backdropFilter="blur(12px)" />
+          <DrawerContent bg="rgba(10, 5, 28, 0.98)">
+            <DrawerHeader borderBottomWidth="1px" borderColor="whiteAlpha.200" px="4" py="4">
+              <Flex justify="space-between" align="center">
+                <Image 
+                  src="/logo.png" 
+                  alt="DeSciAI Logo"
+                  height="32px"
+                  width="auto"
+                  objectFit="contain"
+                />
+                <IconButton
+                  onClick={onClose}
+                  variant="ghost"
+                  icon={<CloseIcon />}
+                  aria-label="Close menu"
+                  color="white"
+                />
+              </Flex>
+            </DrawerHeader>
 
-              <DrawerBody>
-                <VStack spacing="4" align="stretch" mt="8">
-                  <Button 
-                    variant="ghost" 
-                    size="lg" 
-                    justifyContent="flex-start" 
-                    height="16"
+            <DrawerBody px="4" py="6">
+              <VStack spacing="4" align="stretch">
+                {[
+                  { href: "https://desciai.io/ai-agents", label: "AI-AGENTS" },
+                  { href: "https://desciai.io/teams", label: "TEAM" },
+                  { href: "https://desciailabs-organization.gitbook.io/desciai.io", label: "WHITEPAPER" },
+                  { href: "https://desciai.io/how-it-works", label: "HOW IT WORKS" },
+                  { href: "/researchers", label: "RESEARCHERS" },
+                  { href: "#", label: "APPLY" }
+                ].map((item) => (
+                  <Link 
+                    key={item.label} 
+                    href={item.href}
                     onClick={onClose}
+                    _hover={{ textDecoration: 'none' }}
                   >
-                    Projects
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="lg" 
-                    justifyContent="flex-start" 
-                    height="16"
-                    isActive
-                    onClick={onClose}
-                  >
-                    Staking
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="lg" 
-                    justifyContent="flex-start" 
-                    height="16"
-                    onClick={onClose}
-                  >
-                    Apply
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="lg" 
-                    justifyContent="flex-start" 
-                    height="16"
-                    onClick={onClose}
-                  >
-                    Dashboard
-                  </Button>
-                  
-                  <Divider my="4" />
-                  
-                  {/* Additional mobile menu items can go here */}
-                  <VStack spacing="2" align="stretch" mt="4">
-                    <Text color="whiteAlpha.600" fontSize="sm" px="4">
-                      DeSciAI Protocol v1.0
+                    <Text 
+                      fontSize="14px" 
+                      fontWeight="500" 
+                      color="white" 
+                      py="2"
+                      _hover={{ color: "brand.300" }}
+                    >
+                      {item.label}
                     </Text>
-                  </VStack>
-                </VStack>
-              </DrawerBody>
-            </DrawerContent>
-          </Drawer>
-        </Flex>
+                  </Link>
+                ))}
+              </VStack>
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
 
-        <Container maxW="container.xl" py={{ base: "6", md: "12" }} px={{ base: "4", md: "6" }}>
-          {/* Header/Hero Section */}
-          <Box mb={{ base: "8", md: "16" }} textAlign="center" position="relative">
-            {/* Background gradient effect */}
-            <Box
-              position="absolute"
-              top="-50px"
-              left="50%"
-              transform="translateX(-50%)"
-              width="100%"
-              height="300px"
-              background="radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.05) 40%, transparent 70%)"
-              filter="blur(60px)"
-              zIndex="0"
-            />
-            
-            {/* Content */}
-            <VStack spacing={{ base: "4", md: "8" }} position="relative" zIndex="1">
-              <Heading 
-                size={{ base: "xl", md: "2xl" }}
-                bgGradient="linear(to-r, accent.purple, accent.pink)" 
-                bgClip="text"
-                letterSpacing="tight"
-                fontSize={{ base: "4xl", md: "7xl" }}
-                fontWeight="extrabold"
-                position="relative"
-                _after={{
-                  content: '""',
-                  position: 'absolute',
-                  bottom: '-8px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '40px',
-                  height: '4px',
-                  borderRadius: 'full',
-                  bgGradient: 'linear(to-r, accent.purple, accent.pink)',
-                }}
-              >
-                Stake DSI
-              </Heading>
-
-              <HStack 
-                spacing={{ base: "2", md: "4" }}
-                mt="2"
-                flexDir={{ base: "column", sm: "row" }}
-              >
-                <Box
-                  px="4"
-                  py="2"
-                  bg="whiteAlpha.100"
-                  borderRadius="full"
-                  backdropFilter="blur(8px)"
+        {/* Add margin to main content */}
+        <Box as="main" mt="72px">
+          <Container maxW="container.xl" py={{ base: "6", md: "12" }} px={{ base: "4", md: "6" }}>
+            {/* Header/Hero Section */}
+            <Box mb={{ base: "8", md: "16" }} textAlign="center" position="relative">
+              {/* Background gradient effect */}
+              <Box
+                position="absolute"
+                top="-50px"
+                left="50%"
+                transform="translateX(-50%)"
+                width="100%"
+                height="300px"
+                background="radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.05) 40%, transparent 70%)"
+                filter="blur(60px)"
+                zIndex="0"
+              />
+              
+              {/* Content */}
+              <VStack spacing={{ base: "4", md: "8" }} position="relative" zIndex="1">
+                <Heading 
+                  size={{ base: "xl", md: "2xl" }}
+                  bgGradient="linear(to-r, accent.purple, accent.pink)" 
+                  bgClip="text"
+                  letterSpacing="tight"
+                  fontSize={{ base: "4xl", md: "7xl" }}
+                  fontWeight="extrabold"
+                  position="relative"
+                  _after={{
+                    content: '""',
+                    position: 'absolute',
+                    bottom: '-8px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '40px',
+                    height: '4px',
+                    borderRadius: 'full',
+                    bgGradient: 'linear(to-r, accent.purple, accent.pink)',
+                  }}
                 >
-                  <Text fontSize="md" color="whiteAlpha.900">
-                    Up to 3.5x more DSI Power
-                  </Text>
-                </Box>
-                <Box
-                  px="4"
-                  py="2"
-                  bg="whiteAlpha.100"
-                  borderRadius="full"
-                  backdropFilter="blur(8px)"
+                  Stake DSI
+                </Heading>
+
+                <HStack 
+                  spacing={{ base: "2", md: "4" }}
+                  mt="2"
+                  flexDir={{ base: "column", sm: "row" }}
                 >
-                  <Text fontSize="md" color="whiteAlpha.900">
-                    Instant DSI Power
+                  <Box
+                    px="4"
+                    py="2"
+                    bg="whiteAlpha.100"
+                    borderRadius="full"
+                    backdropFilter="blur(8px)"
+                  >
+                    <Text fontSize="md" color="whiteAlpha.900">
+                      Up to 3.5x more DSI Power
+                    </Text>
+                  </Box>
+                  <Box
+                    px="4"
+                    py="2"
+                    bg="whiteAlpha.100"
+                    borderRadius="full"
+                    backdropFilter="blur(8px)"
+                  >
+                    <Text fontSize="md" color="whiteAlpha.900">
+                      Instant DSI Power
+                    </Text>
+                  </Box>
+                </HStack>
+
+                <Text 
+                  fontSize={{ base: "md", md: "xl" }}
+                  color="whiteAlpha.800"
+                  maxW="3xl"
+                  mx="auto"
+                  lineHeight="tall"
+                  mt="4"
+                  px={{ base: "2", md: "0" }}
+                >
+                  Maximize your contribution cap by staking DSI tokens.{" "}
+                  <Text as="span" color="brand.300" fontWeight="bold">
+                    Earn up to 3.5x more DSI-Power
                   </Text>
-                </Box>
-              </HStack>
-
-              <Text 
-                fontSize={{ base: "md", md: "xl" }}
-                color="whiteAlpha.800"
-                maxW="3xl"
-                mx="auto"
-                lineHeight="tall"
-                mt="4"
-                px={{ base: "2", md: "0" }}
-              >
-                Maximize your contribution cap by staking DSI tokens.{" "}
-                <Text as="span" color="brand.300" fontWeight="bold">
-                  Earn up to 3.5x more DSI-Power
+                  {" "}instantly compared to holding.
                 </Text>
-                {" "}instantly compared to holding.
-              </Text>
-            </VStack>
-          </Box>
+              </VStack>
+            </Box>
 
-          {/* Global Statistics */}
-          <Box 
-            mb="12" 
-            p="8" 
-            bg="whiteAlpha.50" 
-            borderRadius="2xl" 
-            borderWidth="1px" 
-            borderColor="whiteAlpha.200"
-            backdropFilter="blur(12px)"
-            boxShadow="xl"
-            position="relative"
-            overflow="hidden"
-          >
-            {/* Background gradient for stats */}
-            <Box
-              position="absolute"
-              top="0"
-              left="0"
-              right="0"
-              bottom="0"
-              background="linear-gradient(180deg, rgba(123, 91, 255, 0.05) 0%, transparent 100%)"
-              zIndex="0"
-            />
-
-            <SimpleGrid 
-              columns={{ base: 1, sm: 2, md: 3 }} 
-              spacing={{ base: "4", md: "8" }}
-              position="relative" 
-              zIndex="1"
-            >
-              <Box p="6" bg="whiteAlpha.100" borderRadius="xl" backdropFilter="blur(8px)">
-                <Text color="whiteAlpha.600" fontSize="sm" mb="2">Total Value Locked</Text>
-                <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, brand.300, purple.400)" bgClip="text">
-                  {parseFloat(totalStaked).toLocaleString()} DSI
-                </Text>
-              </Box>
-
-              <Box p="6" bg="whiteAlpha.100" borderRadius="xl" backdropFilter="blur(8px)">
-                <Text color="whiteAlpha.600" fontSize="sm" mb="2">Total Stakers</Text>
-                <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, brand.300, purple.400)" bgClip="text">
-                  {totalStakers}
-                </Text>
-                <Text fontSize="sm" color="whiteAlpha.600" mt="1">
-                  Unique stakers
-                </Text>
-              </Box>
-
-              <Box p="6" bg="whiteAlpha.100" borderRadius="xl" backdropFilter="blur(8px)">
-                <Text color="whiteAlpha.600" fontSize="sm" mb="2">Total DSI Power</Text>
-                <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, brand.300, purple.400)" bgClip="text">
-                  {parseFloat(totalActiveDSIPower).toFixed(3)}
-                </Text>
-                <Text fontSize="sm" color="whiteAlpha.600" mt="1">
-                  From {activeDSIPowerHolders} active holder{activeDSIPowerHolders !== 1 ? 's' : ''}
-                </Text>
-              </Box>
-            </SimpleGrid>
-          </Box>
-
-          {/* Main Content */}
-          <Flex 
-            gap={{ base: "4", md: "8" }} 
-            direction={{ base: "column", lg: "row" }} 
-            align="stretch"
-          >
-            {/* Left Panel */}
+            {/* Global Statistics */}
             <Box 
-              flex="1" 
+              mb="12" 
+              p="8" 
               bg="whiteAlpha.50" 
-              p={{ base: "4", md: "8" }}
               borderRadius="2xl" 
               borderWidth="1px" 
               borderColor="whiteAlpha.200"
               backdropFilter="blur(12px)"
               boxShadow="xl"
-              transition="all 0.3s ease-in-out"
-              _hover={{ transform: 'translateY(-2px)', boxShadow: '2xl' }}
+              position="relative"
+              overflow="hidden"
             >
-              <Tabs variant="soft-rounded" colorScheme="brand" mb="6">
-                <TabList>
-                  <Tab>Stake</Tab>
-                  <Tab>Unstake</Tab>
-                </TabList>
+              {/* Background gradient for stats */}
+              <Box
+                position="absolute"
+                top="0"
+                left="0"
+                right="0"
+                bottom="0"
+                background="linear-gradient(180deg, rgba(123, 91, 255, 0.05) 0%, transparent 100%)"
+                zIndex="0"
+              />
 
-                <TabPanels>
-                  <TabPanel p="0">
-                    <Flex justify="space-between" mb="6">
-                      <Box>
-                        <Text color="whiteAlpha.700">Available to stake</Text>
-                        <Skeleton
-                          isLoaded={!isLoadingBalance}
-                          startColor="whiteAlpha.100"
-                          endColor="whiteAlpha.300"
-                          borderRadius="xl"
-                        >
-                          <Text fontSize="2xl" fontWeight="bold">{tokenBalance} DSI</Text>
-                        </Skeleton>
-                      </Box>
-                      <Box textAlign="right">
-                        <Text color="whiteAlpha.700">Currently staked</Text>
-                        <Skeleton
-                          isLoaded={!isLoadingBalance}
-                          startColor="whiteAlpha.100"
-                          endColor="whiteAlpha.300"
-                          borderRadius="xl"
-                        >
-                          <Text fontSize="2xl" fontWeight="bold">{userUnclaimedStaked} DSI</Text>
-                        </Skeleton>
-                      </Box>
-                    </Flex>
+              <SimpleGrid 
+                columns={{ base: 1, sm: 2, md: 3 }} 
+                spacing={{ base: "4", md: "8" }}
+                position="relative" 
+                zIndex="1"
+              >
+                <Box p="6" bg="whiteAlpha.100" borderRadius="xl" backdropFilter="blur(8px)">
+                  <Text color="whiteAlpha.600" fontSize="sm" mb="2">Total Value Locked</Text>
+                  <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, brand.300, purple.400)" bgClip="text">
+                    {parseFloat(totalStaked).toLocaleString()} DSI
+                  </Text>
+                </Box>
 
-                    <VStack spacing="6">
-                      <Box width="full" position="relative">
-                        <Input
-                          size="lg"
-                          placeholder="Enter amount to stake"
-                          value={stakeAmount}
-                          onChange={handleAmountChange}
-                          type="number"
-                          isInvalid={!isValidAmount}
-                          pr="24"
-                          bg="rgba(0,0,0,0.2)"
-                          border="1px solid"
-                          borderColor="whiteAlpha.300"
-                          _hover={{
-                            borderColor: "whiteAlpha.400"
-                          }}
-                          _focus={{
-                            borderColor: "brand.300",
-                            boxShadow: "none"
-                          }}
-                          height="60px"
-                          fontSize="md"
-                        />
-                        <Button
-                          position="absolute"
-                          right="4"
-                          top="50%"
-                          transform="translateY(-50%)"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setStakeAmount(tokenBalance)}
-                          color="brand.300"
-                          _hover={{
-                            bg: "transparent",
-                            color: "brand.400"
-                          }}
-                        >
-                          MAX
-                        </Button>
-                        {!isValidAmount && (
-                          <Text color="red.300" mt="2" fontSize="sm">
-                            {validateAmount(stakeAmount)}
-                          </Text>
-                        )}
-                      </Box>
+                <Box p="6" bg="whiteAlpha.100" borderRadius="xl" backdropFilter="blur(8px)">
+                  <Text color="whiteAlpha.600" fontSize="sm" mb="2">Total Stakers</Text>
+                  <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, brand.300, purple.400)" bgClip="text">
+                    {totalStakers}
+                  </Text>
+                  <Text fontSize="sm" color="whiteAlpha.600" mt="1">
+                    Unique stakers
+                  </Text>
+                </Box>
 
-                      <Box width="full" position="relative">
-                        <Input
-                          size="lg"
-                          placeholder="Enter staking duration in days"
-                          value={stakeDuration}
-                          onChange={handleDurationChange}
-                          type="number"
-                          isInvalid={!isValidDuration}
-                          pr="24"
-                          bg="rgba(0,0,0,0.2)"
-                          border="1px solid"
-                          borderColor="whiteAlpha.300"
-                          _hover={{
-                            borderColor: "whiteAlpha.400"
-                          }}
-                          _focus={{
-                            borderColor: "brand.300",
-                            boxShadow: "none"
-                          }}
-                          height="60px"
-                          fontSize="md"
-                          min="1"
-                        />
-                        <Text
-                          position="absolute"
-                          right="4"
-                          top="50%"
-                          transform="translateY(-50%)"
-                          color="whiteAlpha.600"
-                        >
-                          Days
-                        </Text>
-                      </Box>
+                <Box p="6" bg="whiteAlpha.100" borderRadius="xl" backdropFilter="blur(8px)">
+                  <Text color="whiteAlpha.600" fontSize="sm" mb="2">Total DSI Power</Text>
+                  <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, brand.300, purple.400)" bgClip="text">
+                    {parseFloat(totalActiveDSIPower).toFixed(3)}
+                  </Text>
+                  <Text fontSize="sm" color="whiteAlpha.600" mt="1">
+                    From {activeDSIPowerHolders} active holder{activeDSIPowerHolders !== 1 ? 's' : ''}
+                  </Text>
+                </Box>
+              </SimpleGrid>
+            </Box>
 
-                      {!isValidDuration && (
-                        <Text color="red.300" fontSize="sm" alignSelf="flex-start">
-                          Duration must be greater than 0
-                        </Text>
-                      )}
-                      
-                      {stakeDuration && parseInt(stakeDuration) > 365 && (
-                        <Text color="red.400" fontSize="sm" alignSelf="flex-start">
-                          Caution: While you can stake for longer, DSI-Power rewards are calculated and valid only for the first 365 days.
-                        </Text>
-                      )}
+            {/* Main Content */}
+            <Flex 
+              gap={{ base: "4", md: "8" }} 
+              direction={{ base: "column", lg: "row" }} 
+              align="stretch"
+            >
+              {/* Left Panel */}
+              <Box 
+                flex="1" 
+                bg="whiteAlpha.50" 
+                p={{ base: "4", md: "8" }}
+                borderRadius="2xl" 
+                borderWidth="1px" 
+                borderColor="whiteAlpha.200"
+                backdropFilter="blur(12px)"
+                boxShadow="xl"
+                transition="all 0.3s ease-in-out"
+                _hover={{ transform: 'translateY(-2px)', boxShadow: '2xl' }}
+              >
+                <Tabs variant="soft-rounded" colorScheme="brand" mb="6">
+                  <TabList>
+                    <Tab>Stake</Tab>
+                    <Tab>Unstake</Tab>
+                  </TabList>
 
-                      <Box width="full" p="4" bg="whiteAlpha.200" borderRadius="xl">
-                        <Flex justify="space-between" align="center">
-                          <VStack align="start" spacing="1">
-                            <HStack spacing="2">
-                              <Text fontWeight="bold">Estimated DSI Power</Text>
-                              <Text 
-                                fontSize="2xl" 
-                                fontWeight="bold" 
-                                color={stakeDuration && parseInt(stakeDuration) > 365 ? "red.400" : "brand.300"}
-                              >
-                                {parseFloat(estimatedDSIPower).toFixed(3)}
-                              </Text>
-                              <Text color="green.300" fontSize="md">
-                                ({calculatePowerMultiplier().toFixed(1)}x more than holding)
-                              </Text>
-                            </HStack>
-                            <Text fontSize="sm" color="whiteAlpha.600">
-                              Normal holding power would be {calculateNormalDSIPower(parseFloat(stakeAmount), parseFloat(stakeDuration)).toFixed(3)}
-                            </Text>
-                          </VStack>
-                          <Tooltip label="Learn more about DSI Power calculation">
-                            <IconButton
-                              icon={<QuestionIcon />}
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setShowPowerInfo(!showPowerInfo)}
-                            />
-                          </Tooltip>
-                        </Flex>
-                        {showPowerInfo && (
-                          <Alert status="info" mt="4" bg="whiteAlpha.300">
-                            <AlertIcon />
-                            <VStack align="start" spacing="2" width="full">
-                              <Text fontSize="sm">
-                                DSI Power determines your influence in the protocol. Higher power means greater voting weight and rewards.
-                              </Text>
-                              <Text fontSize="sm">
-                                • Holding DSI: Power = Amount × Days
-                                <br />
-                                • Staking DSI: Power = Amount × Days × (1 + 0.2/30 × Days)
-                              </Text>
-                            </VStack>
-                          </Alert>
-                        )}
-                      </Box>
-
-                      <Alert status="info" bg="whiteAlpha.200" borderRadius="lg">
-                        <AlertIcon />
-                        <Text fontSize="sm">
-                          Your staked DSI will be locked for the entire staking period. Early withdrawals are not permitted.
-                        </Text>
-                      </Alert>
-
-                      <Button
-                        size="lg"
-                        width="full"
-                        onClick={handleStake}
-                        isLoading={loading}
-                        loadingText="Staking..."
-                        isDisabled={!isValidAmount || !isValidDuration || loading}
-                      >
-                        Stake Tokens
-                      </Button>
-                    </VStack>
-
-                    {/* Active Stakes Card */}
-                    <Box 
-                      mt="8"
-                      p="6" 
-                      bg="whiteAlpha.50" 
-                      borderRadius="2xl" 
-                      borderWidth="1px" 
-                      borderColor="whiteAlpha.200"
-                      backdropFilter="blur(12px)"
-                      boxShadow="xl"
-                      position="relative"
-                      overflow="hidden"
-                    >
-                      <Flex justify="space-between" align="center" mb="6">
-                        <Text color="whiteAlpha.800" fontSize="lg" fontWeight="semibold">Your Active Stakes</Text>
-                        <HStack spacing="3">
-                          <Text fontSize="sm" color="whiteAlpha.600">Total Staked:</Text>
-                          <Text fontSize="md" fontWeight="bold" color="brand.300">
-                            {userUnclaimedStaked} DSI
-                          </Text>
-                        </HStack>
+                  <TabPanels>
+                    <TabPanel p="0">
+                      <Flex justify="space-between" mb="6">
+                        <Box>
+                          <Text color="whiteAlpha.700">Available to stake</Text>
+                          <Skeleton
+                            isLoaded={!isLoadingBalance}
+                            startColor="whiteAlpha.100"
+                            endColor="whiteAlpha.300"
+                            borderRadius="xl"
+                          >
+                            <Text fontSize="2xl" fontWeight="bold">{tokenBalance} DSI</Text>
+                          </Skeleton>
+                        </Box>
+                        <Box textAlign="right">
+                          <Text color="whiteAlpha.700">Currently staked</Text>
+                          <Skeleton
+                            isLoaded={!isLoadingBalance}
+                            startColor="whiteAlpha.100"
+                            endColor="whiteAlpha.300"
+                            borderRadius="xl"
+                          >
+                            <Text fontSize="2xl" fontWeight="bold">{userUnclaimedStaked} DSI</Text>
+                          </Skeleton>
+                        </Box>
                       </Flex>
 
-                      <VStack spacing={{ base: "3", md: "4" }} align="stretch">
-                        {userStakes.filter(stake => !stake.claimed).length > 0 ? (
+                      <VStack spacing="6">
+                        <Box width="full" position="relative">
+                          <Input
+                            size="lg"
+                            placeholder="Enter amount to stake"
+                            value={stakeAmount}
+                            onChange={handleAmountChange}
+                            type="number"
+                            isInvalid={!isValidAmount}
+                            pr="24"
+                            bg="rgba(0,0,0,0.2)"
+                            border="1px solid"
+                            borderColor="whiteAlpha.300"
+                            _hover={{
+                              borderColor: "whiteAlpha.400"
+                            }}
+                            _focus={{
+                              borderColor: "brand.300",
+                              boxShadow: "none"
+                            }}
+                            height="60px"
+                            fontSize="md"
+                          />
+                          <Button
+                            position="absolute"
+                            right="4"
+                            top="50%"
+                            transform="translateY(-50%)"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setStakeAmount(tokenBalance)}
+                            color="brand.300"
+                            _hover={{
+                              bg: "transparent",
+                              color: "brand.400"
+                            }}
+                          >
+                            MAX
+                          </Button>
+                          {!isValidAmount && (
+                            <Text color="red.300" mt="2" fontSize="sm">
+                              {validateAmount(stakeAmount)}
+                            </Text>
+                          )}
+                        </Box>
+
+                        <Box width="full" position="relative">
+                          <Input
+                            size="lg"
+                            placeholder="Enter staking duration in days"
+                            value={stakeDuration}
+                            onChange={handleDurationChange}
+                            type="number"
+                            isInvalid={!isValidDuration}
+                            pr="24"
+                            bg="rgba(0,0,0,0.2)"
+                            border="1px solid"
+                            borderColor="whiteAlpha.300"
+                            _hover={{
+                              borderColor: "whiteAlpha.400"
+                            }}
+                            _focus={{
+                              borderColor: "brand.300",
+                              boxShadow: "none"
+                            }}
+                            height="60px"
+                            fontSize="md"
+                            min="1"
+                          />
+                          <Text
+                            position="absolute"
+                            right="4"
+                            top="50%"
+                            transform="translateY(-50%)"
+                            color="whiteAlpha.600"
+                          >
+                            Days
+                          </Text>
+                        </Box>
+
+                        {!isValidDuration && (
+                          <Text color="red.300" fontSize="sm" alignSelf="flex-start">
+                            Duration must be greater than 0
+                          </Text>
+                        )}
+                        
+                        {stakeDuration && parseInt(stakeDuration) > 365 && (
+                          <Text color="red.400" fontSize="sm" alignSelf="flex-start">
+                            Caution: While you can stake for longer, DSI-Power rewards are calculated and valid only for the first 365 days.
+                          </Text>
+                        )}
+
+                        <Box width="full" p="4" bg="whiteAlpha.200" borderRadius="xl">
+                          <Flex justify="space-between" align="center">
+                            <VStack align="start" spacing="1">
+                              <HStack spacing="2">
+                                <Text fontWeight="bold">Estimated DSI Power</Text>
+                                <Text 
+                                  fontSize="2xl" 
+                                  fontWeight="bold" 
+                                  color={stakeDuration && parseInt(stakeDuration) > 365 ? "red.400" : "brand.300"}
+                                >
+                                  {parseFloat(estimatedDSIPower).toFixed(3)}
+                                </Text>
+                                <Text color="green.300" fontSize="md">
+                                  ({calculatePowerMultiplier().toFixed(1)}x more than holding)
+                                </Text>
+                              </HStack>
+                              <Text fontSize="sm" color="whiteAlpha.600">
+                                Normal holding power would be {calculateNormalDSIPower(parseFloat(stakeAmount), parseFloat(stakeDuration)).toFixed(3)}
+                              </Text>
+                            </VStack>
+                            <Tooltip label="Learn more about DSI Power calculation">
+                              <IconButton
+                                icon={<QuestionIcon />}
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowPowerInfo(!showPowerInfo)}
+                              />
+                            </Tooltip>
+                          </Flex>
+                          {showPowerInfo && (
+                            <Alert status="info" mt="4" bg="whiteAlpha.300">
+                              <AlertIcon />
+                              <VStack align="start" spacing="2" width="full">
+                                <Text fontSize="sm">
+                                  DSI Power determines your influence in the protocol. Higher power means greater voting weight and rewards.
+                                </Text>
+                                <Text fontSize="sm">
+                                  • Holding DSI: Power = Amount × Days
+                                  <br />
+                                  • Staking DSI: Power = Amount × Days × (1 + 0.2/30 × Days)
+                                </Text>
+                              </VStack>
+                            </Alert>
+                          )}
+                        </Box>
+
+                        <Alert status="info" bg="whiteAlpha.200" borderRadius="lg">
+                          <AlertIcon />
+                          <Text fontSize="sm">
+                            Your staked DSI will be locked for the entire staking period. Early withdrawals are not permitted.
+                          </Text>
+                        </Alert>
+
+                        <Button
+                          size="lg"
+                          width="full"
+                          onClick={handleStake}
+                          isLoading={loading}
+                          loadingText="Staking..."
+                          isDisabled={!isValidAmount || !isValidDuration || loading}
+                        >
+                          Stake Tokens
+                        </Button>
+                      </VStack>
+
+                      {/* Active Stakes Card */}
+                      <Box 
+                        mt="8"
+                        p="6" 
+                        bg="whiteAlpha.50" 
+                        borderRadius="2xl" 
+                        borderWidth="1px" 
+                        borderColor="whiteAlpha.200"
+                        backdropFilter="blur(12px)"
+                        boxShadow="xl"
+                        position="relative"
+                        overflow="hidden"
+                      >
+                        <Flex justify="space-between" align="center" mb="6">
+                          <Text color="whiteAlpha.800" fontSize="lg" fontWeight="semibold">Your Active Stakes</Text>
+                          <HStack spacing="3">
+                            <Text fontSize="sm" color="whiteAlpha.600">Total Staked:</Text>
+                            <Text fontSize="md" fontWeight="bold" color="brand.300">
+                              {userUnclaimedStaked} DSI
+                            </Text>
+                          </HStack>
+                        </Flex>
+
+                        <VStack spacing={{ base: "3", md: "4" }} align="stretch">
+                          {userStakes.filter(stake => !stake.claimed).length > 0 ? (
+                            userStakes
+                              .filter(stake => !stake.claimed)
+                              .map((stake, index) => (
+                                <Box
+                                  key={`stake-${index}-${stake.startTime.toString()}`}
+                                  p="4"
+                                  bg="whiteAlpha.200"
+                                  borderRadius="xl"
+                                  width="full"
+                                  position="relative"
+                                  transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                                  _before={{
+                                    content: '""',
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    borderRadius: 'xl',
+                                    background: 'linear-gradient(45deg, var(--chakra-colors-brand-400), var(--chakra-colors-purple-400))',
+                                    opacity: 0,
+                                    transition: 'opacity 0.3s ease-in-out',
+                                    zIndex: -1
+                                  }}
+                                  _hover={{
+                                    transform: 'translateY(-2px)',
+                                    shadow: 'xl',
+                                    _before: {
+                                      opacity: 0.1
+                                    }
+                                  }}
+                                >
+                                  <Flex justify="space-between" align="center">
+                                    <VStack align="start" spacing="1">
+                                      <Text fontSize="lg" fontWeight="bold">
+                                        {ethers.utils.formatEther(stake.amount)} DSI
+                                      </Text>
+                                      <Text color="brand.300">
+                                        {parseFloat(ethers.utils.formatEther(stake.dsiPower)).toFixed(3)} Power
+                                      </Text>
+                                    </VStack>
+                                    <VStack align="end" spacing="1">
+                                      <Text>
+                                        {formatTimeLeft(stake.endTime.toNumber())}
+                                      </Text>
+                                      <Progress
+                                        value={100 - (Math.ceil((stake.endTime - Date.now()/1000)/60) * 100)}
+                                        size="xs"
+                                        width={{ base: "80px", md: "100px" }}
+                                        colorScheme="brand"
+                                        borderRadius="full"
+                                      />
+                                      {isStakeClaimable(stake) ? (
+                                        <Button
+                                          onClick={() => handleClaim(index, stake)}
+                                          isDisabled={claimingStakes[index]}
+                                          colorScheme="green"
+                                          size="sm"
+                                          animation={`${pulseAnimation} 2s infinite`}
+                                          _hover={{
+                                            transform: 'scale(1.05)'
+                                          }}
+                                        >
+                                          Claim
+                                        </Button>
+                                      ) : (
+                                        <Text 
+                                          fontSize="sm" 
+                                          color="whiteAlpha.600"
+                                          bgGradient="linear(to-r, brand.300, purple.400)"
+                                          bgClip="text"
+                                          fontWeight="medium"
+                                        >
+                                          {formatTimeLeft(stake.endTime.toNumber())}
+                                        </Text>
+                                      )}
+                                    </VStack>
+                                  </Flex>
+                                </Box>
+                              ))
+                          ) : (
+                            <Alert status="info" bg="whiteAlpha.200">
+                              <AlertIcon />
+                              <Text>You don't have any active stakes yet</Text>
+                            </Alert>
+                          )}
+                        </VStack>
+                      </Box>
+                    </TabPanel>
+
+                    <TabPanel p="0">
+                      <Flex justify="space-between" align="center" mb="4">
+                        <Text color="whiteAlpha.700" fontSize="lg">Your Stakes</Text>
+                        <Button
+                          onClick={handleClaimAll}
+                          isLoading={claimAllLoading}
+                          loadingText="Claiming..."
+                          colorScheme="green"
+                          size="sm"
+                          isDisabled={!userStakes.some(stake => isStakeClaimable(stake))}
+                        >
+                          Claim All Matured Stakes
+                        </Button>
+                      </Flex>
+                      <VStack spacing="4" align="stretch">
+                        {userStakes.length > 0 ? (
                           userStakes
                             .filter(stake => !stake.claimed)
                             .map((stake, index) => (
                               <Box
-                                key={`stake-${index}-${stake.startTime.toString()}`}
+                                key={`unstake-${index}-${stake.startTime.toString()}`}
                                 p="4"
                                 bg="whiteAlpha.200"
                                 borderRadius="xl"
-                                width="full"
-                                position="relative"
-                                transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                                _before={{
-                                  content: '""',
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 0,
-                                  borderRadius: 'xl',
-                                  background: 'linear-gradient(45deg, var(--chakra-colors-brand-400), var(--chakra-colors-purple-400))',
-                                  opacity: 0,
-                                  transition: 'opacity 0.3s ease-in-out',
-                                  zIndex: -1
-                                }}
-                                _hover={{
-                                  transform: 'translateY(-2px)',
-                                  shadow: 'xl',
-                                  _before: {
-                                    opacity: 0.1
-                                  }
-                                }}
+                                transition="all 0.2s"
+                                _hover={{ transform: 'translateY(-2px)', shadow: 'lg' }}
                               >
                                 <Flex justify="space-between" align="center">
                                   <VStack align="start" spacing="1">
@@ -1470,286 +1629,214 @@ function App() {
                         ) : (
                           <Alert status="info" bg="whiteAlpha.200">
                             <AlertIcon />
-                            <Text>You don't have any active stakes yet</Text>
+                            <Text>You don't have any stakes to unstake</Text>
                           </Alert>
                         )}
                       </VStack>
-                    </Box>
-                  </TabPanel>
+                    </TabPanel>
+                  </TabPanels>
+                </Tabs>
+              </Box>
 
-                  <TabPanel p="0">
-                    <Flex justify="space-between" align="center" mb="4">
-                      <Text color="whiteAlpha.700" fontSize="lg">Your Stakes</Text>
-                      <Button
-                        onClick={handleClaimAll}
-                        isLoading={claimAllLoading}
-                        loadingText="Claiming..."
-                        colorScheme="green"
-                        size="sm"
-                        isDisabled={!userStakes.some(stake => isStakeClaimable(stake))}
-                      >
-                        Claim All Matured Stakes
-                      </Button>
-                    </Flex>
-                    <VStack spacing="4" align="stretch">
-                      {userStakes.length > 0 ? (
-                        userStakes
-                          .filter(stake => !stake.claimed)
-                          .map((stake, index) => (
-                            <Box
-                              key={`unstake-${index}-${stake.startTime.toString()}`}
-                              p="4"
-                              bg="whiteAlpha.200"
-                              borderRadius="xl"
-                              transition="all 0.2s"
-                              _hover={{ transform: 'translateY(-2px)', shadow: 'lg' }}
-                            >
-                              <Flex justify="space-between" align="center">
-                                <VStack align="start" spacing="1">
-                                  <Text fontSize="lg" fontWeight="bold">
-                                    {ethers.utils.formatEther(stake.amount)} DSI
-                                  </Text>
-                                  <Text color="brand.300">
-                                    {parseFloat(ethers.utils.formatEther(stake.dsiPower)).toFixed(3)} Power
-                                  </Text>
-                                </VStack>
-                                <VStack align="end" spacing="1">
-                                  <Text>
-                                    {formatTimeLeft(stake.endTime.toNumber())}
-                                  </Text>
-                                  <Progress
-                                    value={100 - (Math.ceil((stake.endTime - Date.now()/1000)/60) * 100)}
-                                    size="xs"
-                                    width={{ base: "80px", md: "100px" }}
-                                    colorScheme="brand"
-                                    borderRadius="full"
-                                  />
-                                  {isStakeClaimable(stake) ? (
-                                    <Button
-                                      onClick={() => handleClaim(index, stake)}
-                                      isDisabled={claimingStakes[index]}
-                                      colorScheme="green"
-                                      size="sm"
-                                      animation={`${pulseAnimation} 2s infinite`}
-                                      _hover={{
-                                        transform: 'scale(1.05)'
-                                      }}
-                                    >
-                                      Claim
-                                    </Button>
-                                  ) : (
-                                    <Text 
-                                      fontSize="sm" 
-                                      color="whiteAlpha.600"
-                                      bgGradient="linear(to-r, brand.300, purple.400)"
-                                      bgClip="text"
-                                      fontWeight="medium"
-                                    >
-                                      {formatTimeLeft(stake.endTime.toNumber())}
-                                    </Text>
-                                  )}
-                                </VStack>
-                              </Flex>
-                            </Box>
-                          ))
-                      ) : (
-                        <Alert status="info" bg="whiteAlpha.200">
-                          <AlertIcon />
-                          <Text>You don't have any stakes to unstake</Text>
-                        </Alert>
-                      )}
-                    </VStack>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </Box>
-
-            {/* Right Panel */}
-            <Box 
-              w={{ base: "full", lg: "400px" }} 
-              bg="whiteAlpha.50" 
-              p={{ base: "4", md: "6" }} 
-              borderRadius="2xl" 
-              borderWidth="1px" 
-              borderColor="whiteAlpha.200"
-              backdropFilter="blur(10px)"
-              boxShadow="xl"
-              transition="all 0.3s"
-              _hover={{ transform: 'translateY(-2px)' }}
-            >
-              <VStack spacing="6" align="stretch">
-                <Box>
-                  <HStack mb="4" justify="space-between">
-                    <HStack>
-                      <Text fontSize="lg">⚡ Your DSI Power</Text>
-                      <Tooltip 
-                        label="Your total earned DSI Power from all active stakes"
-                        placement="top"
-                        hasArrow
-                        bg="gray.700"
-                        color="white"
-                        px="3"
-                        py="2"
-                        borderRadius="md"
-                      >
-                        <IconButton
-                          icon={<InfoIcon />}
-                          variant="ghost"
-                          size="sm"
-                        />
-                      </Tooltip>
-                    </HStack>
-                    <Text fontSize="lg" color="brand.300" fontWeight="bold">
-                      {parseFloat(totalEarnedPower).toFixed(3)}
-                    </Text>
-                  </HStack>
-                  <Box p="4" bg="whiteAlpha.200" borderRadius="xl">
-                    <VStack align="stretch" spacing="3">
-                      <Flex justify="space-between" align="center">
-                        <Text color="whiteAlpha.700">Power Share</Text>
-                        <Text fontWeight="bold" color="brand.300">
-                          {calculateDSIPowerPercentage().toFixed(3)}%
-                        </Text>
-                      </Flex>
-                      <Progress 
-                        value={calculateDSIPowerPercentage()} 
-                        size="sm" 
-                        colorScheme="brand" 
-                        borderRadius="full"
-                        bg="whiteAlpha.300"
-                      />
-                      <Text fontSize="sm" color="whiteAlpha.600">
-                        of total {parseFloat(totalActiveDSIPower).toFixed(3)} DSI Power
-                      </Text>
-                    </VStack>
-                  </Box>
-                </Box>
-
-                {/* Add Tier System Display */}
-                <Box>
-                  <HStack mb="4" justify="space-between">
-                    <Text fontSize="lg">🏆 Power Tier</Text>
-                    <Text 
-                      fontSize="lg" 
-                      fontWeight="bold" 
-                      bgGradient="linear(to-r, yellow.400, orange.400)" 
-                      bgClip="text"
-                    >
-                      Tier {account ? calculateUserTier() : "-"}
-                    </Text>
-                  </HStack>
-                  <Box p="4" bg="whiteAlpha.200" borderRadius="xl">
-                    <VStack align="stretch" spacing="3">
-                      {[
-                        { tier: 5, requirement: "≥ 1%", color: "purple.400" },
-                        { tier: 4, requirement: "≥ 0.1%", color: "blue.400" },
-                        { tier: 3, requirement: "≥ 0.01%", color: "green.400" },
-                        { tier: 2, requirement: "≥ 0.001%", color: "yellow.400" },
-                        { tier: 1, requirement: "> 0% and < 0.001%", color: "gray.400" }
-                      ].map((tier) => (
-                        <Box
-                          key={tier.tier}
-                          p="4"
-                          bg={account && calculateUserTier() === tier.tier ? 'whiteAlpha.200' : 'transparent'}
-                          borderRadius="lg"
-                          border="1px solid"
-                          borderColor={account && calculateUserTier() === tier.tier ? tier.color : 'transparent'}
-                          transition="all 0.3s ease-in-out"
-                          position="relative"
-                          _before={{
-                            content: '""',
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            borderRadius: 'lg',
-                            background: account && calculateUserTier() === tier.tier 
-                              ? `linear-gradient(45deg, ${tier.color}, transparent)`
-                              : 'transparent',
-                            opacity: 0.1,
-                            transition: 'opacity 0.3s ease-in-out'
-                          }}
-                          _hover={{
-                            transform: 'translateX(4px)',
-                            _before: {
-                              opacity: 0.2
-                            }
-                          }}
+              {/* Right Panel */}
+              <Box 
+                w={{ base: "full", lg: "400px" }} 
+                bg="whiteAlpha.50" 
+                p={{ base: "4", md: "6" }} 
+                borderRadius="2xl" 
+                borderWidth="1px" 
+                borderColor="whiteAlpha.200"
+                backdropFilter="blur(10px)"
+                boxShadow="xl"
+                transition="all 0.3s"
+                _hover={{ transform: 'translateY(-2px)' }}
+              >
+                <VStack spacing="6" align="stretch">
+                  <Box>
+                    <HStack mb="4" justify="space-between">
+                      <HStack>
+                        <Text fontSize="lg">⚡ Your DSI Power</Text>
+                        <Tooltip 
+                          label="Your total earned DSI Power from all active stakes"
+                          placement="top"
+                          hasArrow
+                          bg="gray.700"
+                          color="white"
+                          px="3"
+                          py="2"
+                          borderRadius="md"
                         >
-                          <HStack>
-                            <Text 
-                              fontWeight={account && calculateUserTier() === tier.tier ? "bold" : "normal"}
-                              color={account && calculateUserTier() === tier.tier ? tier.color : "whiteAlpha.800"}
-                            >
-                              Tier {tier.tier}
-                            </Text>
-                            {account && calculateUserTier() === tier.tier && (
-                              <Text fontSize="sm" color={tier.color}>(Current)</Text>
-                            )}
-                          </HStack>
-                          <Text color="whiteAlpha.600">{tier.requirement} Power Share</Text>
-                        </Box>
-                      ))}
-                    </VStack>
+                          <IconButton
+                            icon={<InfoIcon />}
+                            variant="ghost"
+                            size="sm"
+                          />
+                        </Tooltip>
+                      </HStack>
+                      <Text fontSize="lg" color="brand.300" fontWeight="bold">
+                        {parseFloat(totalEarnedPower).toFixed(3)}
+                      </Text>
+                    </HStack>
+                    <Box p="4" bg="whiteAlpha.200" borderRadius="xl">
+                      <VStack align="stretch" spacing="3">
+                        <Flex justify="space-between" align="center">
+                          <Text color="whiteAlpha.700">Power Share</Text>
+                          <Text fontWeight="bold" color="brand.300">
+                            {calculateDSIPowerPercentage().toFixed(3)}%
+                          </Text>
+                        </Flex>
+                        <Progress 
+                          value={calculateDSIPowerPercentage()} 
+                          size="sm" 
+                          colorScheme="brand" 
+                          borderRadius="full"
+                          bg="whiteAlpha.300"
+                        />
+                        <Text fontSize="sm" color="whiteAlpha.600">
+                          of total {parseFloat(totalActiveDSIPower).toFixed(3)} DSI Power
+                        </Text>
+                      </VStack>
+                    </Box>
                   </Box>
-                </Box>
 
-                <Box>
-                  <Text mb="4">DSI Power Formula</Text>
-                  <Box p="4" bg="whiteAlpha.200" borderRadius="xl" position="relative">
-                    <Text fontSize="lg" fontFamily="mono">
-                      DSI-Power = x · y · (1 + 0.2/30 · y)
-                    </Text>
-                    <Text fontSize="sm" color="whiteAlpha.600" mt="2">
-                      where x = stake amount, y = duration in days
-                    </Text>
+                  {/* Add Tier System Display */}
+                  <Box>
+                    <HStack mb="4" justify="space-between">
+                      <Text fontSize="lg">🏆 Power Tier</Text>
+                      <Text 
+                        fontSize="lg" 
+                        fontWeight="bold" 
+                        bgGradient="linear(to-r, yellow.400, orange.400)" 
+                        bgClip="text"
+                      >
+                        Tier {account ? calculateUserTier() : "-"}
+                      </Text>
+                    </HStack>
+                    <Box p="4" bg="whiteAlpha.200" borderRadius="xl">
+                      <VStack align="stretch" spacing="3">
+                        {[
+                          { tier: 5, requirement: "≥ 1%", color: "purple.400" },
+                          { tier: 4, requirement: "≥ 0.1%", color: "blue.400" },
+                          { tier: 3, requirement: "≥ 0.01%", color: "green.400" },
+                          { tier: 2, requirement: "≥ 0.001%", color: "yellow.400" },
+                          { tier: 1, requirement: "> 0% and < 0.001%", color: "gray.400" }
+                        ].map((tier) => (
+                          <Box
+                            key={tier.tier}
+                            p="4"
+                            bg={account && calculateUserTier() === tier.tier ? 'whiteAlpha.200' : 'transparent'}
+                            borderRadius="lg"
+                            border="1px solid"
+                            borderColor={account && calculateUserTier() === tier.tier ? tier.color : 'transparent'}
+                            transition="all 0.3s ease-in-out"
+                            position="relative"
+                            _before={{
+                              content: '""',
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              borderRadius: 'lg',
+                              background: account && calculateUserTier() === tier.tier 
+                                ? `linear-gradient(45deg, ${tier.color}, transparent)`
+                                : 'transparent',
+                              opacity: 0.1,
+                              transition: 'opacity 0.3s ease-in-out'
+                            }}
+                            _hover={{
+                              transform: 'translateX(4px)',
+                              _before: {
+                                opacity: 0.2
+                              }
+                            }}
+                          >
+                            <HStack>
+                              <Text 
+                                fontWeight={account && calculateUserTier() === tier.tier ? "bold" : "normal"}
+                                color={account && calculateUserTier() === tier.tier ? tier.color : "whiteAlpha.800"}
+                              >
+                                Tier {tier.tier}
+                              </Text>
+                              {account && calculateUserTier() === tier.tier && (
+                                <Text fontSize="sm" color={tier.color}>(Current)</Text>
+                              )}
+                            </HStack>
+                            <Text color="whiteAlpha.600">{tier.requirement} Power Share</Text>
+                          </Box>
+                        ))}
+                      </VStack>
+                    </Box>
                   </Box>
-                </Box>
-              </VStack>
-            </Box>
-          </Flex>
 
-          {/* Footer */}
-          <Text 
-            mt="12" 
-            mb="6" 
-            color="whiteAlpha.600" 
-            fontSize="sm" 
-            textAlign="center"
-            maxW="2xl"
-            mx="auto"
-            lineHeight="tall"
-          >
-            Staking may involve risks; please read our{" "}
+                  <Box>
+                    <Text mb="4">DSI Power Formula</Text>
+                    <Box p="4" bg="whiteAlpha.200" borderRadius="xl" position="relative">
+                      <Text fontSize="lg" fontFamily="mono">
+                        DSI-Power = x · y · (1 + 0.2/30 · y)
+                      </Text>
+                      <Text fontSize="sm" color="whiteAlpha.600" mt="2">
+                        where x = stake amount, y = duration in days
+                      </Text>
+                    </Box>
+                  </Box>
+                </VStack>
+              </Box>
+            </Flex>
+
+            {/* Footer */}
             <Text 
-              as="span" 
-              color="brand.300" 
-              cursor="pointer" 
-              _hover={{ 
-                color: 'brand.400',
-                textDecoration: 'underline' 
-              }}
-              transition="all 0.2s"
+              mt="12" 
+              mb="6" 
+              color="whiteAlpha.600" 
+              fontSize="sm" 
+              textAlign="center"
+              maxW="2xl"
+              mx="auto"
+              lineHeight="tall"
             >
-              Terms of Service
-            </Text>{" "}
-            and{" "}
-            <Text 
-              as="span" 
-              color="brand.300" 
-              cursor="pointer" 
-              _hover={{ 
-                color: 'brand.400',
-                textDecoration: 'underline' 
-              }}
-              transition="all 0.2s"
-            >
-              documentation
-            </Text>{" "}
-            before proceeding.
-          </Text>
-        </Container>
+              Please read our{" "}
+              <Link 
+                href="https://desciai.io/terms"
+                isExternal
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text 
+                  as="span" 
+                  color="brand.300" 
+                  cursor="pointer" 
+                  _hover={{ 
+                    color: 'brand.400',
+                    textDecoration: 'underline' 
+                  }}
+                  transition="all 0.2s"
+                >
+                  Terms of Service
+                </Text>{" "}
+              </Link>{" "}
+              and{" "}
+              <Link 
+                href="https://desciailabs-organization.gitbook.io/desciai.io"
+                isExternal
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text 
+                  as="span" 
+                  color="brand.300" 
+                  cursor="pointer" 
+                  _hover={{ 
+                    color: 'brand.400',
+                    textDecoration: 'underline' 
+                  }}
+                  transition="all 0.2s"
+                >
+                  documentation
+                </Text>
+              </Link>{" "}
+              before proceeding.
+            </Text>
+          </Container>
+        </Box>
       </Box>
     </ChakraProvider>
   );
