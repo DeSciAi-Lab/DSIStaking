@@ -117,7 +117,7 @@ import {
   useEventListener,
   useTheme as useChakraTheme,
 } from '@chakra-ui/react';
-import { InfoIcon, QuestionIcon, ExternalLinkIcon } from '@chakra-ui/icons';
+import { InfoIcon, QuestionIcon, ExternalLinkIcon, HamburgerIcon } from '@chakra-ui/icons';
 import { FaWallet } from 'react-icons/fa';
 import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
@@ -140,6 +140,13 @@ const theme = extendTheme({
       },
       'html': {
         scrollBehavior: 'smooth'
+      },
+      '.no-scrollbar': {
+        '-ms-overflow-style': 'none',
+        'scrollbarWidth': 'none',
+        '&::-webkit-scrollbar': {
+          display: 'none'
+        }
       }
     }
   },
@@ -148,8 +155,8 @@ const theme = extendTheme({
       50: '#e9e4ff',
       100: '#c5b7ff',
       200: '#a089ff',
-      300: '#8B5CF6', // Primary purple from DeSciAI
-      400: '#7C3AED', // Darker purple
+      300: '#96509F', // Primary purple from DeSciAI
+      400: '#96509F', // Darker purple
       500: '#6D28D9',
       600: '#5B21B6',
       700: '#4C1D95',
@@ -310,6 +317,10 @@ function App() {
   const [claimAllLoading, setClaimAllLoading] = useState(false);
   
   const toast = useToast();
+
+  // Add this state for mobile menu
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     // Check if there's a cached provider and connect automatically
@@ -880,37 +891,124 @@ function App() {
           as="nav" 
           align="center" 
           justify="space-between" 
-          padding="4" 
-          bg="rgba(10, 11, 30, 0.8)"
+          padding={{ base: "3", md: "4" }}
+          position="relative"
           borderBottom="1px"
-          borderColor="whiteAlpha.100"
-          position="sticky"
-          top="0"
-          zIndex="sticky"
-          backdropFilter="blur(12px)"
+          borderColor="whiteAlpha.200"
         >
-          <HStack spacing="8">
-            <Text fontSize="2xl" fontWeight="bold" color="brand.300">DeSciAI</Text>
-            <HStack spacing="6">
-              <Button variant="ghost">Projects</Button>
-              <Button variant="ghost" isActive>Staking</Button>
-              <Button variant="ghost">Apply</Button>
-              <Button variant="ghost">Dashboard</Button>
+          <HStack spacing={{ base: "4", md: "8" }}>
+            <Image 
+              src="/logo.png" 
+              alt="DeSciAI Logo"
+              height={{ base: "32px", md: "40px" }}
+              width="auto"
+              objectFit="contain"
+            />
+            
+            {/* Desktop Navigation */}
+            <HStack 
+              spacing={{ base: "3", md: "6" }}
+              display={{ base: "none", md: "flex" }}
+            >
+              <Button variant="ghost" size="md">Projects</Button>
+              <Button variant="ghost" isActive size="md">Staking</Button>
+              <Button variant="ghost" size="md">Apply</Button>
+              <Button variant="ghost" size="md">Dashboard</Button>
             </HStack>
           </HStack>
-          <Button
-            onClick={account ? disconnectWallet : connectWallet}
-            variant="solid"
-            size="lg"
-            leftIcon={<FaWallet />}
+
+          <HStack spacing="4">
+            <Button
+              onClick={account ? disconnectWallet : connectWallet}
+              variant="solid"
+              size={{ base: "md", md: "lg" }}
+              leftIcon={<FaWallet />}
+            >
+              {!account ? "Connect Wallet" : `${account.slice(0, 6)}...${account.slice(-4)}`}
+            </Button>
+
+            {/* Hamburger Menu Button - Mobile Only */}
+            <IconButton
+              display={{ base: "flex", md: "none" }}
+              onClick={onOpen}
+              variant="ghost"
+              icon={<HamburgerIcon />}
+              aria-label="Open menu"
+              size="lg"
+            />
+          </HStack>
+
+          {/* Mobile Navigation Drawer */}
+          <Drawer
+            isOpen={isOpen}
+            placement="right"
+            onClose={onClose}
+            size="full"
           >
-            {!account ? "Connect Wallet" : `${account.slice(0, 6)}...${account.slice(-4)}`}
-          </Button>
+            <DrawerOverlay backdropFilter="blur(10px)" />
+            <DrawerContent bg="rgba(10, 11, 30, 0.97)">
+              <DrawerCloseButton size="lg" />
+              <DrawerHeader borderBottomWidth="1px" borderColor="whiteAlpha.200">
+                <Text color="brand.300" fontSize="2xl">DeSciAI</Text>
+              </DrawerHeader>
+
+              <DrawerBody>
+                <VStack spacing="4" align="stretch" mt="8">
+                  <Button 
+                    variant="ghost" 
+                    size="lg" 
+                    justifyContent="flex-start" 
+                    height="16"
+                    onClick={onClose}
+                  >
+                    Projects
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="lg" 
+                    justifyContent="flex-start" 
+                    height="16"
+                    isActive
+                    onClick={onClose}
+                  >
+                    Staking
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="lg" 
+                    justifyContent="flex-start" 
+                    height="16"
+                    onClick={onClose}
+                  >
+                    Apply
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="lg" 
+                    justifyContent="flex-start" 
+                    height="16"
+                    onClick={onClose}
+                  >
+                    Dashboard
+                  </Button>
+                  
+                  <Divider my="4" />
+                  
+                  {/* Additional mobile menu items can go here */}
+                  <VStack spacing="2" align="stretch" mt="4">
+                    <Text color="whiteAlpha.600" fontSize="sm" px="4">
+                      DeSciAI Protocol v1.0
+                    </Text>
+                  </VStack>
+                </VStack>
+              </DrawerBody>
+            </DrawerContent>
+          </Drawer>
         </Flex>
 
-        <Container maxW="container.xl" py="12">
+        <Container maxW="container.xl" py={{ base: "6", md: "12" }} px={{ base: "4", md: "6" }}>
           {/* Header/Hero Section */}
-          <Box mb="16" textAlign="center" position="relative">
+          <Box mb={{ base: "8", md: "16" }} textAlign="center" position="relative">
             {/* Background gradient effect */}
             <Box
               position="absolute"
@@ -925,9 +1023,9 @@ function App() {
             />
             
             {/* Content */}
-            <VStack spacing="8" position="relative" zIndex="1">
+            <VStack spacing={{ base: "4", md: "8" }} position="relative" zIndex="1">
               <Heading 
-                size="2xl" 
+                size={{ base: "xl", md: "2xl" }}
                 bgGradient="linear(to-r, accent.purple, accent.pink)" 
                 bgClip="text"
                 letterSpacing="tight"
@@ -950,8 +1048,9 @@ function App() {
               </Heading>
 
               <HStack 
-                spacing="4" 
+                spacing={{ base: "2", md: "4" }}
                 mt="2"
+                flexDir={{ base: "column", sm: "row" }}
               >
                 <Box
                   px="4"
@@ -978,12 +1077,13 @@ function App() {
               </HStack>
 
               <Text 
-                fontSize={{ base: "lg", md: "xl" }} 
-                color="whiteAlpha.800" 
-                maxW="3xl" 
-                mx="auto" 
+                fontSize={{ base: "md", md: "xl" }}
+                color="whiteAlpha.800"
+                maxW="3xl"
+                mx="auto"
                 lineHeight="tall"
                 mt="4"
+                px={{ base: "2", md: "0" }}
               >
                 Maximize your contribution cap by staking DSI tokens.{" "}
                 <Text as="span" color="brand.300" fontWeight="bold">
@@ -1018,7 +1118,12 @@ function App() {
               zIndex="0"
             />
 
-            <SimpleGrid columns={{ base: 1, md: 3 }} spacing="8" position="relative" zIndex="1">
+            <SimpleGrid 
+              columns={{ base: 1, sm: 2, md: 3 }} 
+              spacing={{ base: "4", md: "8" }}
+              position="relative" 
+              zIndex="1"
+            >
               <Box p="6" bg="whiteAlpha.100" borderRadius="xl" backdropFilter="blur(8px)">
                 <Text color="whiteAlpha.600" fontSize="sm" mb="2">Total Value Locked</Text>
                 <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, brand.300, purple.400)" bgClip="text">
@@ -1049,12 +1154,16 @@ function App() {
           </Box>
 
           {/* Main Content */}
-          <Flex gap="8" direction={{ base: 'column', lg: 'row' }} align="stretch">
+          <Flex 
+            gap={{ base: "4", md: "8" }} 
+            direction={{ base: "column", lg: "row" }} 
+            align="stretch"
+          >
             {/* Left Panel */}
             <Box 
               flex="1" 
               bg="whiteAlpha.50" 
-              p="8" 
+              p={{ base: "4", md: "8" }}
               borderRadius="2xl" 
               borderWidth="1px" 
               borderColor="whiteAlpha.200"
@@ -1276,7 +1385,7 @@ function App() {
                         </HStack>
                       </Flex>
 
-                      <VStack spacing="4" align="stretch">
+                      <VStack spacing={{ base: "3", md: "4" }} align="stretch">
                         {userStakes.filter(stake => !stake.claimed).length > 0 ? (
                           userStakes
                             .filter(stake => !stake.claimed)
@@ -1324,9 +1433,9 @@ function App() {
                                       {formatTimeLeft(stake.endTime.toNumber())}
                                     </Text>
                                     <Progress
-                                      value={100 - (Math.ceil((stake.endTime - Date.now()/1000)/60) / (24 * 60)) * 100}
+                                      value={100 - (Math.ceil((stake.endTime - Date.now()/1000)/60) * 100)}
                                       size="xs"
-                                      width="100px"
+                                      width={{ base: "80px", md: "100px" }}
                                       colorScheme="brand"
                                       borderRadius="full"
                                     />
@@ -1409,9 +1518,9 @@ function App() {
                                     {formatTimeLeft(stake.endTime.toNumber())}
                                   </Text>
                                   <Progress
-                                    value={100 - (Math.ceil((stake.endTime - Date.now()/1000)/60) / (24 * 60)) * 100}
+                                    value={100 - (Math.ceil((stake.endTime - Date.now()/1000)/60) * 100)}
                                     size="xs"
-                                    width="100px"
+                                    width={{ base: "80px", md: "100px" }}
                                     colorScheme="brand"
                                     borderRadius="full"
                                   />
@@ -1459,7 +1568,7 @@ function App() {
             <Box 
               w={{ base: "full", lg: "400px" }} 
               bg="whiteAlpha.50" 
-              p="6" 
+              p={{ base: "4", md: "6" }} 
               borderRadius="2xl" 
               borderWidth="1px" 
               borderColor="whiteAlpha.200"
