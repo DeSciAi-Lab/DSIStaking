@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { keyframes } from '@emotion/react';
 import {
   ChakraProvider,
@@ -117,7 +117,7 @@ import {
   useEventListener,
   useTheme as useChakraTheme,
 } from '@chakra-ui/react';
-import { InfoIcon, QuestionIcon, ExternalLinkIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
+import { InfoIcon, QuestionIcon, ExternalLinkIcon, HamburgerIcon, CloseIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { FaWallet } from 'react-icons/fa';
 import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
@@ -349,6 +349,10 @@ function App() {
   // Add this state for mobile menu
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Add this state for dropdown menu
+  const [showNavDropdown, setShowNavDropdown] = useState(false);
+  const navDropdownRef = useRef(null);
 
   useEffect(() => {
     // Check if there's a cached provider and connect automatically
@@ -911,6 +915,24 @@ function App() {
     100% { transform: scale(1); }
   `;
 
+  // Add this function to toggle the dropdown menu
+  const handleNavDropdownToggle = () => {
+    setShowNavDropdown((prev) => !prev);
+  };
+
+  const handleClickOutside = (event) => {
+    if (navDropdownRef.current && !navDropdownRef.current.contains(event.target)) {
+      setShowNavDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <ChakraProvider theme={theme}>
       <Box minH="100vh" bg="#0A0B1E">
@@ -935,7 +957,7 @@ function App() {
             height="72px"
           >
             {/* Logo */}
-            <Link href="https://desciai.io">
+            <Link href="/">
               <Image 
                 src="/logo.png" 
                 alt="DeSciAI Logo"
@@ -949,48 +971,90 @@ function App() {
             <HStack 
               spacing="9"
               display={{ base: "none", lg: "flex" }}
+              alignItems="center"
             >
               <Link 
-                href="https://desciai.io/ai-agents" 
+                href="https://desciai.io/beta/explore" 
                 _hover={{ textDecoration: 'none' }}
               >
-                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
-                  AI-AGENTS
+                <Text fontSize="16px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  PROJECTS
                 </Text>
               </Link>
               <Link 
-                href="https://desciai.io/teams"
+                href="https://desciai.io/beta/descipad"
                 _hover={{ textDecoration: 'none' }}
               >
-                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
-                  TEAM
+                <Text fontSize="16px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  DESCIPAD
                 </Text>
               </Link>
               <Link 
-                href="https://desciailabs-organization.gitbook.io/desciai.io"
+                href="https://beta.staking.desciai.io/"
                 _hover={{ textDecoration: 'none' }}
               >
-                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
-                  WHITEPAPER
+                <Text fontSize="16px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  STAKING
                 </Text>
               </Link>
               <Link 
-                href="https://desciai.io/how-it-works"
+                href="https://dashboard.desciai.io/"
                 _hover={{ textDecoration: 'none' }}
               >
-                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
-                  HOW IT WORKS
+                <Text fontSize="16px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  DASHBOARD
                 </Text>
               </Link>
               <Link 
-                href="https://dashboard.desciai.io/researchers"
+                href="https://desciai.io/beta/faucet"
                 _hover={{ textDecoration: 'none' }}
               >
-                <Text fontSize="14px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
-                  RESEARCHERS
+                <Text fontSize="16px" fontWeight="500" color="white" _hover={{ color: "brand.300" }}>
+                  FAUCET
                 </Text>
               </Link>
-             
+              <Box position="relative" ref={navDropdownRef}>
+                <IconButton 
+                  onClick={handleNavDropdownToggle}
+                  variant="ghost"
+                  color="white"
+                  _hover={{ color: "brand.300" }}
+                  icon={
+                    <ChevronDownIcon 
+                      boxSize={6}
+                      transform={showNavDropdown ? 'rotate(180deg)' : 'rotate(0deg)'} 
+                      transition="transform 0.2s"
+                    />
+                  }
+                  aria-label="Toggle Dropdown"
+                />
+                {showNavDropdown && (
+                  <Box 
+                    position="absolute" 
+                    right="0" 
+                    mt="2" 
+                    w="48" 
+                    bg="#1A1A1A" 
+                    rounded="lg" 
+                    shadow="lg" 
+                    py="2" 
+                    zIndex="50"
+                  >
+                    <Link href="https://desciai.io/beta/ai-agents" onClick={() => setShowNavDropdown(false)}>
+                      <Text px="4" py="2" color="white" _hover={{ bg: "#2A2A2A" }}>AI-AGENTS</Text>
+                    </Link>
+                    <Link href="https://desciai.io/beta/teams" onClick={() => setShowNavDropdown(false)}>
+                      <Text px="4" py="2" color="white" _hover={{ bg: "#2A2A2A" }}>TEAM</Text>
+                    </Link>
+                    <Link href="https://desciailabs-organization.gitbook.io/desciai.io" onClick={() => setShowNavDropdown(false)}>
+                      <Text px="4" py="2" color="white" _hover={{ bg: "#2A2A2A" }}>WHITEPAPER</Text>
+                    </Link>
+                    <Link href="https://desciai.io/beta/how-it-works" onClick={() => setShowNavDropdown(false)}>
+                      <Text px="4" py="2" color="white" _hover={{ bg: "#2A2A2A" }}>HOW IT WORKS</Text>
+                    </Link>
+                  </Box>
+                )}
+              </Box>
             </HStack>
 
             <HStack spacing="4">
@@ -1049,12 +1113,11 @@ function App() {
             <DrawerBody px="4" py="6">
               <VStack spacing="4" align="stretch">
                 {[
-                  { href: "https://desciai.io/ai-agents", label: "AI-AGENTS" },
-                  { href: "https://desciai.io/teams", label: "TEAM" },
-                  { href: "https://desciailabs-organization.gitbook.io/desciai.io", label: "WHITEPAPER" },
-                  { href: "https://desciai.io/how-it-works", label: "HOW IT WORKS" },
-                  { href: "/researchers", label: "RESEARCHERS" },
-                  { href: "#", label: "APPLY" }
+                  { href: "https://desciai.io/beta/explore", label: "PROJECTS" },
+                  { href: "https://desciai.io/beta/descipad", label: "DESCIPAD" },
+                  { href: "https://beta.staking.desciai.io/", label: "STAKING" },
+                  { href: "https://dashboard.desciai.io/", label: "DASHBOARD" },
+                  { href: "https://desciai.io/beta/faucet", label: "FAUCET" }
                 ].map((item) => (
                   <Link 
                     key={item.label} 
@@ -1677,26 +1740,6 @@ function App() {
                         {parseFloat(totalEarnedPower).toFixed(3)}
                       </Text>
                     </HStack>
-                    <Box p="4" bg="whiteAlpha.200" borderRadius="xl">
-                      <VStack align="stretch" spacing="3">
-                        <Flex justify="space-between" align="center">
-                          <Text color="whiteAlpha.700">Power Share</Text>
-                          <Text fontWeight="bold" color="brand.300">
-                            {calculateDSIPowerPercentage().toFixed(3)}%
-                          </Text>
-                        </Flex>
-                        <Progress 
-                          value={calculateDSIPowerPercentage()} 
-                          size="sm" 
-                          colorScheme="brand" 
-                          borderRadius="full"
-                          bg="whiteAlpha.300"
-                        />
-                        <Text fontSize="sm" color="whiteAlpha.600">
-                          of total {parseFloat(totalActiveDSIPower).toFixed(3)} DSI Power
-                        </Text>
-                      </VStack>
-                    </Box>
                   </Box>
 
                   {/* Add Tier System Display */}
